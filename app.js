@@ -181,9 +181,15 @@ function applyLanguage(lang) {
     "Añade tu prompt de instrucción aquí..." : "Enter your custom instruction prompt here...";
 
   // Toggle buttons visual state
-  document.getElementById("btn-lang-en").classList.toggle("active", lang === "en");
-  document.getElementById("btn-lang-es").classList.toggle("active", lang === "es");
-  document.getElementById("lang-label").textContent = lang.toUpperCase();
+  const dashLangEn = document.getElementById("btn-dash-lang-en");
+  const dashLangEs = document.getElementById("btn-dash-lang-es");
+  const splashLangEn = document.getElementById("btn-lang-en");
+  const splashLangEs = document.getElementById("btn-lang-es");
+
+  if (dashLangEn) dashLangEn.classList.toggle("active", lang === "en");
+  if (dashLangEs) dashLangEs.classList.toggle("active", lang === "es");
+  if (splashLangEn) splashLangEn.classList.toggle("active", lang === "en");
+  if (splashLangEs) splashLangEs.classList.toggle("active", lang === "es");
 
   // Re-draw Path & Leagues in localized text
   renderSkillTree();

@@ -113,9 +113,10 @@
               <button class="btn-icon" id="btn-sound-toggle" onclick="toggleSound()">
                 <i class="fa-solid fa-volume-high"></i>
               </button>
-              <button class="btn-icon" id="btn-language-toggle" onclick="toggleLanguage()">
-                <span id="lang-label">ES</span>
-              </button>
+              <div class="lang-selector-pill">
+                <button id="btn-dash-lang-en" class="btn-lang-pill" onclick="setLanguage('en')">EN</button>
+                <button id="btn-dash-lang-es" class="btn-lang-pill" onclick="setLanguage('es')">ES</button>
+              </div>
             </div>
           </header>
 
