@@ -946,17 +946,28 @@ function toggleSound() {
 }
 
 function lazyInitAudio() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  try {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+  } catch (e) {
+    console.warn("AudioContext could not be initialized:", e);
+    audioCtx = null;
   }
 }
 
 function playSynthesizerSound(type) {
   if (soundMuted) return;
   lazyInitAudio();
-  if (!audioCtx || audioCtx.state === "suspended") {
-    // Attempt resume context if suspended by browser
-    audioCtx.resume();
+  if (!audioCtx) return; // Silent return if audio init failed or is blocked
+  
+  if (audioCtx.state === "suspended") {
+    try {
+      // Attempt resume context if suspended by browser
+      audioCtx.resume();
+    } catch (e) {
+      console.warn("Failed to resume AudioContext:", e);
+    }
   }
   
   try {
