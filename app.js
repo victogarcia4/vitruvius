@@ -120,6 +120,7 @@ let activeCardIndex = 0;
 let selectedCardIndex = null;
 let activeCodeFillValue = null;
 let activeLessonHearts = 5;
+let wrongAnswerCards = new Set(); // Track cards answered wrong (no XP for these)
 
 // ==================== APP INITIALIZATION & LOCALIZATION ====================
 document.addEventListener("DOMContentLoaded", () => {
@@ -433,6 +434,7 @@ function launchLesson(lessonId, isUnlocked) {
   activeLesson = targetLesson;
   activeCardIndex = 0;
   activeLessonHearts = window.vitruviusState.state.hearts;
+  wrongAnswerCards = new Set();
 
   transitionScreen("screen-dashboard", "screen-lesson");
   renderActiveLessonCard();
@@ -622,16 +624,6 @@ function handleLessonAction() {
       return;
     }
     correct = (selectedCardIndex === card.answer);
-    
-    // UI Visual highlighting states
-    document.querySelectorAll(".choice-tile-btn").forEach((btn, idx) => {
-      btn.onclick = null; // Disable clicks
-      if (idx === card.answer) {
-        btn.classList.add("correct-eval");
-      } else if (idx === selectedCardIndex) {
-        btn.classList.add("incorrect-eval");
-      }
-    });
 
   } else if (card.type === "code") {
     if (!activeCodeFillValue) {
@@ -639,7 +631,6 @@ function handleLessonAction() {
       return;
     }
     correct = (activeCodeFillValue === card.answer);
-    document.querySelectorAll(".code-tile-option").forEach(btn => btn.onclick = null);
 
   } else if (card.type === "slider") {
     correct = (selectedCardIndex === card.target);
@@ -668,15 +659,36 @@ function handleLessonAction() {
     feedbackMascotImg.src = "assets/vitru-happy.png";
     const successPhrases = ["Good job!", "You rock!", "Excellent!", "You are right!", "That's good!", "Ok!"];
     utterance.text = successPhrases[Math.floor(Math.random() * successPhrases.length)];
+
+    // Highlight the correct answer in the UI
+    if (card.type === "mcq") {
+      document.querySelectorAll(".choice-tile-btn").forEach((btn, idx) => {
+        btn.onclick = null; // Disable clicks
+        if (idx === card.answer) {
+          btn.classList.add("correct-eval");
+        }
+      });
+    } else if (card.type === "code") {
+      document.querySelectorAll(".code-tile-option").forEach(btn => btn.onclick = null);
+    }
+
+    // Allow continuing to the next card
+    const actionBtn = document.getElementById("btn-lesson-action");
+    actionBtn.className = "btn-primary btn-full glow-emerald";
+    document.getElementById("lessonActionText").textContent = dict.nextBtn;
+
   } else {
     playSynthesizerSound("error");
     feedbackPanel.className = "footer-evaluation-feedback incorrect";
     feedbackTitle.textContent = dict.incorrectTxt;
-    feedbackText.textContent = lang === "es" ? card.explanation_es : card.explanation_en;
+    feedbackText.textContent = lang === "es" ? "¡Inténtalo de nuevo! Selecciona otra opción." : "Try again! Select another option.";
     
     // Sad Mascot Update
     feedbackMascotImg.src = "assets/vitru-sad.png";
     utterance.text = "Try again!";
+
+    // Mark this card as wrong (no XP for this card)
+    wrongAnswerCards.add(activeCardIndex);
 
     // Deduct Hearts
     activeLessonHearts--;
@@ -691,11 +703,90 @@ function handleLessonAction() {
       }, 1500);
       return;
     }
-  }
 
-  const actionBtn = document.getElementById("btn-lesson-action");
-  actionBtn.className = correct ? "btn-primary btn-full glow-emerald" : "btn-primary btn-full glow-magenta";
-  document.getElementById("lessonActionText").textContent = dict.nextBtn;
+    // Visually mark the wrong selection, then reset after a delay so user can try again
+    if (card.type === "mcq") {
+      const wrongBtn = document.getElementById(`choice-${selectedCardIndex}`);
+      if (wrongBtn) wrongBtn.classList.add("incorrect-eval");
+      
+      // Temporarily disable all choices during feedback
+      document.querySelectorAll(".choice-tile-btn").forEach(btn => {
+        btn.style.pointerEvents = "none";
+      });
+
+      setTimeout(() => {
+        // Re-enable choices except the wrong one (disable it permanently)
+        document.querySelectorAll(".choice-tile-btn").forEach((btn, idx) => {
+          if (idx === selectedCardIndex) {
+            // Keep wrong answer disabled and visually marked
+            btn.classList.add("incorrect-eval", "disabled-choice");
+            btn.onclick = null;
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.4";
+          } else if (!btn.classList.contains("disabled-choice")) {
+            btn.style.pointerEvents = "auto";
+          }
+        });
+
+        // Reset selection state
+        selectedCardIndex = null;
+        
+        // Hide feedback panel
+        feedbackPanel.style.display = "none";
+
+        // Reset button back to CHECK
+        const actionBtn = document.getElementById("btn-lesson-action");
+        actionBtn.className = "btn-primary btn-full glow-cyan";
+        document.getElementById("lessonActionText").textContent = lang === "es" ? "COMPROBAR" : "CHECK ANSWER";
+      }, 1800);
+
+    } else if (card.type === "code") {
+      // Temporarily disable code tiles
+      document.querySelectorAll(".code-tile-option").forEach(btn => {
+        btn.style.pointerEvents = "none";
+      });
+
+      const wrongValue = activeCodeFillValue;
+
+      setTimeout(() => {
+        // Re-enable code tiles except the wrong one
+        document.querySelectorAll(".code-tile-option").forEach(btn => {
+          if (btn.textContent === wrongValue) {
+            btn.classList.add("disabled-choice");
+            btn.onclick = null;
+            btn.style.pointerEvents = "none";
+            btn.style.opacity = "0.4";
+          } else if (!btn.classList.contains("disabled-choice")) {
+            btn.style.pointerEvents = "auto";
+          }
+        });
+
+        // Reset the code blank
+        const blank = document.getElementById("code-blank-slot");
+        if (blank) {
+          blank.textContent = "????";
+          blank.classList.remove("filled");
+        }
+        activeCodeFillValue = null;
+
+        // Hide feedback panel
+        feedbackPanel.style.display = "none";
+
+        // Reset button back to CHECK
+        const actionBtn = document.getElementById("btn-lesson-action");
+        actionBtn.className = "btn-primary btn-full glow-cyan";
+        document.getElementById("lessonActionText").textContent = lang === "es" ? "COMPROBAR" : "CHECK ANSWER";
+      }, 1800);
+
+    } else if (card.type === "slider") {
+      setTimeout(() => {
+        feedbackPanel.style.display = "none";
+        const actionBtn = document.getElementById("btn-lesson-action");
+        actionBtn.className = "btn-primary btn-full glow-cyan";
+        document.getElementById("lessonActionText").textContent = lang === "es" ? "COMPROBAR" : "CHECK ANSWER";
+      }, 1800);
+    }
+  }
 
   // Play Speech
   if (!soundMuted) {
@@ -733,7 +824,7 @@ function finishLessonWithOutro() {
   const lang = window.vitruviusState.state.preferredLanguage;
   const state = window.vitruviusState.state;
   
-  // Commit state and calculate awards
+  // Award full XP — user had to answer every question correctly to get here
   const rewards = window.vitruviusState.completeLesson(activeLesson.id, activeLesson.xp);
   updateHUD();
 
