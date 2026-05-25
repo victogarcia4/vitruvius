@@ -542,16 +542,20 @@ function renderActiveLessonCard() {
     const sandbox = document.createElement("div");
     sandbox.className = "glass-card config-card";
     
+    const sliderTitle = lang === "es" ? "Temperatura:" : "Temperature:";
+    const minLabel = lang === "es" ? card.options_es.min_label : card.options_en.min_label;
+    const maxLabel = lang === "es" ? card.options_es.max_label : card.options_en.max_label;
+
     sandbox.innerHTML = `
       <div class="card-section">
         <div class="slider-header">
-          <span style="color: var(--neon-magenta);"><i class="fa-solid fa-temperature-half"></i> Temperature:</span>
+          <span style="color: var(--neon-magenta);"><i class="fa-solid fa-temperature-half"></i> ${sliderTitle}</span>
           <span class="slider-val" id="card-slider-val" style="color: var(--neon-emerald);">1.0</span>
         </div>
         <input type="range" class="custom-slider" id="card-slider-range" min="0.0" max="2.0" step="0.2" value="1.0" oninput="updateSliderVal('card-slider-range', 'card-slider-val'); verifySliderAnswer()">
         <div class="slider-labels">
-          <span>${card.options_en.min_label}</span>
-          <span>${card.options_en.max_label}</span>
+          <span>${minLabel}</span>
+          <span>${maxLabel}</span>
         </div>
       </div>
     `;
