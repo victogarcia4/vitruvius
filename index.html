@@ -79,7 +79,7 @@
           </div>
           
           <div class="splash-footer">
-            <button id="btn-start" class="btn-primary glow-cyan">
+            <button id="btn-start" class="btn-primary glow-cyan" onclick="if(typeof playSynthesizerSound==='function'){playSynthesizerSound('start')};document.getElementById('screen-splash').classList.remove('active');document.getElementById('screen-dashboard').classList.add('active');if(typeof switchTab==='function'){switchTab('path')}">
               <span id="startText">INICIAR PORTAL</span> <i class="fa-solid fa-bolt"></i>
             </button>
             <button id="btn-google-login" class="btn-secondary" style="margin-top: 15px; display: none;">
@@ -404,7 +404,7 @@
           </div>
           
           <div class="outro-footer">
-            <button id="btn-outro-finish" class="btn-primary glow-cyan btn-full" onclick="finishLessonFlow()">
+            <button id="btn-outro-finish" class="btn-primary glow-cyan btn-full" onclick="try{finishLessonFlow()}catch(e){document.querySelectorAll('.app-screen').forEach(function(s){s.classList.remove('active')});document.getElementById('screen-splash').classList.add('active')}">
               <span id="btnOutroText">CONTINUAR AL CAMINO</span> <i class="fa-solid fa-door-open"></i>
             </button>
           </div>
@@ -419,5 +419,18 @@
   <script src="curriculum.js"></script>
   <script src="state.js"></script>
   <script src="app.js"></script>
+
+  <!-- Boot guard: force splash on every fresh page load -->
+  <script>
+    (function() {
+      try {
+        // Force all screens off, then activate splash
+        document.querySelectorAll('.app-screen').forEach(function(s) {
+          s.classList.remove('active');
+        });
+        document.getElementById('screen-splash').classList.add('active');
+      } catch(e) { console.error('Boot guard error:', e); }
+    })();
+  </script>
 </body>
 </html>
