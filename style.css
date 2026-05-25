@@ -1573,7 +1573,7 @@ body.cyber-theme {
 .footer-evaluation-feedback.correct h4 { color: var(--neon-emerald); }
 
 /* ==================== OUTRO SCREEN ==================== */
-#screen-outro {
+#screen-outro.active {
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
