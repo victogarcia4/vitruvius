@@ -58,7 +58,8 @@ const I18N_DICTIONARY = {
     btnRefillHearts: "RECARGAR (+150 XP)",
     btnRefillCancel: "ESPERAR REGEN",
     promptEvalCorrect: "¡Excelente prompt! Cumple con la estructura de ingeniería.",
-    promptEvalIncorrect: "Tu prompt podría mejorarse. Intenta usar delimitadores o ser más específico."
+    promptEvalIncorrect: "Tu prompt podría mejorarse. Intenta usar delimitadores o ser más específico.",
+    desktopBubbleText: "¡Hola, Humano! 👋 Soy Vitrü. Prepárate para dominar los modelos fundacionales de Google, entender ventanas de contexto y parametrizar prompts como un arquitecto senior. ¡Entra en mi portal!"
   },
   en: {
     startText: "LAUNCH PORTAL",
@@ -108,7 +109,8 @@ const I18N_DICTIONARY = {
     btnRefillHearts: "REFILL (+150 XP)",
     btnRefillCancel: "WAIT REGEN",
     promptEvalCorrect: "Excellent prompt! Follows prompt engineering rules.",
-    promptEvalIncorrect: "Your prompt can be optimized. Try using delimiters or instructions."
+    promptEvalIncorrect: "Your prompt can be optimized. Try using delimiters or instructions.",
+    desktopBubbleText: "Hello, Human! 👋 I am Vitrü. Get ready to master Google's foundational models, understand context windows, and engineer prompts like a senior architect. Enter my portal!"
   }
 };
 
