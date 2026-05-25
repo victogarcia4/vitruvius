@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vitruvius - Micro-Aprendizaje Gamificado de IA Generativa</title>
+  <meta name="description" content="Domina la Ingeniería de Prompts, Gemini, NotebookLM y Google AI Studio con la rana cibernética Vitrü en este simulador educativo gamificado de alto impacto visual.">
+  
+  <!-- Modern Typography (Outfit and Fira Code for terminals) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- FontAwesome Icons for modern aesthetic -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="cyber-theme">
+
+  <!-- Desktop Presentation Background Wrap -->
+  <div class="presentation-container">
+    
+    <!-- Branding Sidebar (Visible only on desktop screens for premium aesthetic) -->
+    <div class="branding-panel" id="brandingPanel">
+      <div class="brand-header">
+        <span class="cyber-badge">SYSTEM STABLE v1.0</span>
+        <h1 class="logo-text">VITRUVIUS</h1>
+        <p class="brand-tagline">Architecting the future of AI engineering, one hop at a time.</p>
+      </div>
+      
+      <div class="mascot-speech-bubble" id="desktopMascotBubble">
+        <div class="bubble-content" id="desktopBubbleText">
+          ¡Hola, Humano! 👋 Soy Vitrü. Prepárate para dominar los modelos fundacionales de Google, entender ventanas de contexto y parametrizar prompts como un arquitecto senior. ¡Entra en mi portal!
+        </div>
+        <div class="bubble-arrow"></div>
+      </div>
+      
+      <div class="branding-mascot-container">
+        <!-- Vitrü Mascot Avatar (will render in style.css/assets) -->
+        <div class="mascot-glow-ring"></div>
+        <img src="assets/vitru.png" alt="Vitrü the Cyber Frog" id="desktopMascotImage" class="mascot-floating">
+      </div>
+
+      <div class="branding-footer">
+        <p>Bilingual Core | English & Español</p>
+        <p class="copyright">&copy; 2026 DeepMind Advanced Agentic Coding Team</p>
+      </div>
+    </div>
+
+    <!-- MAIN MOBILE SIMULATOR FRAME -->
+    <div class="mobile-frame-wrapper" id="mobileFrameWrapper">
+      <div class="phone-status-notch">
+        <div class="notch-speaker"></div>
+        <div class="notch-camera"></div>
+      </div>
+      
+      <div class="app-container" id="appContainer">
+        
+        <!-- ==================== SPLASH SCREEN ==================== -->
+        <section id="screen-splash" class="app-screen active">
+          <div class="splash-particles"></div>
+          
+          <div class="splash-header">
+            <div class="lang-selector-floating">
+              <button id="btn-lang-en" class="btn-lang" onclick="setLanguage('en')">EN</button>
+              <button id="btn-lang-es" class="btn-lang active" onclick="setLanguage('es')">ES</button>
+            </div>
+          </div>
+          
+          <div class="splash-body">
+            <div class="splash-portal">
+              <div class="portal-ring ring-1"></div>
+              <div class="portal-ring ring-2"></div>
+              <img src="assets/vitru.png" alt="Vitrü Sage" class="splash-mascot">
+            </div>
+            <h2 class="splash-title">VITRUVIUS</h2>
+            <p class="splash-subtitle" id="splashSubtitle">Micro-aprendizaje de Inteligencia Artificial Generativa</p>
+          </div>
+          
+          <div class="splash-footer">
+            <button id="btn-start" class="btn-primary glow-cyan">
+              <span id="startText">INICIAR PORTAL</span> <i class="fa-solid fa-bolt"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- ==================== MAIN DASHBOARD (TABS PANEL) ==================== -->
+        <section id="screen-dashboard" class="app-screen">
+          
+          <!-- Shared Header -->
+          <header class="app-header">
+            <div class="header-user-stats">
+              <div class="stat-badge xp-badge" id="hudXpBadge">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span id="hud-xp">0 XP</span>
+              </div>
+              <div class="stat-badge streak-badge" id="hudStreakBadge">
+                <i class="fa-solid fa-fire"></i>
+                <span id="hud-streak">0</span>
+              </div>
+              <div class="stat-badge hearts-badge" id="hudHeartsBadge" onclick="promptRefillHearts()">
+                <i class="fa-solid fa-heart heart-pulse"></i>
+                <span id="hud-hearts">5</span>
+                <span class="regen-timer-small" id="hud-regen-timer">--:--</span>
+              </div>
+            </div>
+            
+            <div class="header-actions">
+              <button class="btn-icon" id="btn-sound-toggle" onclick="toggleSound()">
+                <i class="fa-solid fa-volume-high"></i>
+              </button>
+              <button class="btn-icon" id="btn-language-toggle" onclick="toggleLanguage()">
+                <span id="lang-label">ES</span>
+              </button>
+            </div>
+          </header>
+
+          <!-- Dynamic Tab Content Views -->
+          <div class="tab-content-container" id="tabContentContainer">
+            
+            <!-- VIEW: THE PATH (SKILL MAP) -->
+            <div id="view-path" class="tab-view active">
+              <div class="path-scroll-wrapper">
+                <div class="path-introduction">
+                  <h3 id="pathWelcome">Tu Ruta de Habilidades</h3>
+                  <p id="pathSub">Aprende haciendo. Completa los nodos para avanzar.</p>
+                </div>
+                
+                <!-- Skill Map Tree Container -->
+                <div class="skill-tree-path" id="skillTreeContainer">
+                  <!-- SVG line path will be drawn behind nodes -->
+                  <svg class="path-svg-line" id="pathSvgLine"></svg>
+                  <div class="nodes-list" id="nodesList">
+                    <!-- Injected dynamically by app.js -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: PLAYGROUND (DEVELOPER SANDBOX) -->
+            <div id="view-playground" class="tab-view">
+              <div class="playground-wrapper">
+                <h3 id="pgTitle">Laboratorio AI Studio</h3>
+                <p id="pgSub">Ajusta parámetros reales y prueba tu ingeniería de prompts.</p>
+                
+                <div class="glass-card config-card">
+                  <div class="card-section">
+                    <label id="lblTargetModel"><i class="fa-solid fa-microchip"></i> Modelo Core:</label>
+                    <select class="custom-select" id="pg-model-select">
+                      <option value="gemini-1.5-flash">Gemini 1.5 Flash (Bajo coste/Veloz)</option>
+                      <option value="gemini-1.5-pro">Gemini 1.5 Pro (Lógico/Multimodal)</option>
+                    </select>
+                  </div>
+                  
+                  <div class="card-section">
+                    <div class="slider-header">
+                      <span id="lblTemp"><i class="fa-solid fa-temperature-half"></i> Temperatura:</span>
+                      <span class="slider-val" id="pg-temp-val">1.0</span>
+                    </div>
+                    <input type="range" class="custom-slider" id="pg-temp" min="0.0" max="2.0" step="0.1" value="1.0" oninput="updateSliderVal('pg-temp', 'pg-temp-val')">
+                    <div class="slider-labels">
+                      <span id="lblTempMin">Determinista</span>
+                      <span id="lblTempMax">Creativo</span>
+                    </div>
+                  </div>
+
+                  <div class="card-section">
+                    <div class="slider-header">
+                      <span><i class="fa-solid fa-sliders"></i> Top-P:</span>
+                      <span class="slider-val" id="pg-topp-val">0.95</span>
+                    </div>
+                    <input type="range" class="custom-slider" id="pg-topp" min="0.0" max="1.0" step="0.05" value="0.95" oninput="updateSliderVal('pg-topp', 'pg-topp-val')">
+                  </div>
+                  
+                  <div class="card-section toggle-section">
+                    <label id="lblSystemInstructions"><i class="fa-solid fa-scroll"></i> Instrucciones del Sistema:</label>
+                    <textarea class="custom-textarea textarea-small" id="pg-system" placeholder="Eres una rana inteligente que traduce todo al idioma de los sapos..."></textarea>
+                  </div>
+                </div>
+
+                <div class="glass-card api-key-card">
+                  <div class="toggle-header" onclick="toggleApiKeyInput()">
+                    <span><i class="fa-solid fa-key"></i> ¿Usar tu API Key de Gemini real?</span>
+                    <i class="fa-solid fa-chevron-down" id="apiKeyChevron"></i>
+                  </div>
+                  <div class="collapsible-content" id="apiKeyCollapse">
+                    <p class="key-hint" id="keyHint">Tus credenciales se guardan localmente en tu navegador y se llaman directamente a Google APIs.</p>
+                    <input type="password" class="custom-input" id="pg-api-key" placeholder="AIzaSy...">
+                  </div>
+                </div>
+
+                <div class="prompt-workbench">
+                  <label id="lblPromptWorkbench"><i class="fa-solid fa-terminal"></i> Workbench de Prompt:</label>
+                  <textarea class="custom-textarea" id="pg-prompt" placeholder="Escribe tu prompt aquí..."></textarea>
+                  
+                  <button class="btn-primary btn-full glow-magenta" id="btn-run-prompt" onclick="runSandboxPrompt()">
+                    <span id="btnRunPromptText">EJECUTAR PROMPT</span> <i class="fa-solid fa-play"></i>
+                  </button>
+                </div>
+
+                <div class="terminal-output-container">
+                  <div class="terminal-header">
+                    <span class="terminal-dot red"></span>
+                    <span class="terminal-dot yellow"></span>
+                    <span class="terminal-dot green"></span>
+                    <span class="terminal-title">GEMINI_TERMINAL_OUTPUT</span>
+                  </div>
+                  <div class="terminal-body" id="pg-output">
+                    Esperando ejecución de prompt...
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: LEAGUES (weekly leaderboard) -->
+            <div id="view-leagues" class="tab-view">
+              <div class="leagues-wrapper">
+                <div class="league-tier-header">
+                  <div class="league-shield-glowing">
+                    <i class="fa-solid fa-shield-halved"></i>
+                  </div>
+                  <h3 id="leagueTitle">Liga de Obsidiana</h3>
+                  <p id="leagueSub">El top 5 asciende. El bottom 5 desciende de rango.</p>
+                </div>
+                
+                <div class="league-timer-bar">
+                  <span id="lblTimeRemaining">Fin de Temporada:</span>
+                  <span class="timer-countdown" id="leagueTimerCountdown">6d 21h 38m</span>
+                </div>
+
+                <div class="leaderboard-card">
+                  <div class="leaderboard-table-header">
+                    <span id="colRank">Rango</span>
+                    <span id="colUser">Usuario</span>
+                    <span id="colXp">XP Semanal</span>
+                  </div>
+                  
+                  <div class="leaderboard-list-scrollable" id="leaderboardList">
+                    <!-- Injected dynamically by state.js / app.js -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- VIEW: PROFILE & STATS -->
+            <div id="view-profile" class="tab-view">
+              <div class="profile-wrapper">
+                <div class="profile-header-card">
+                  <div class="avatar-holder">
+                    <div class="avatar-neon-ring"></div>
+                    <img src="assets/vitru.png" alt="Profile Avatar" class="profile-avatar">
+                  </div>
+                  <div class="profile-meta">
+                    <h3 id="profileName" class="editable-name" onclick="editProfileName()">AI Explorer <i class="fa-solid fa-pen-to-square"></i></h3>
+                    <div class="level-indicator-badge">
+                      <span id="profileLevelLabel">Nivel 1</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="xp-progress-section">
+                  <div class="xp-labels-row">
+                    <span id="xpProgressTitle">Progreso de Nivel</span>
+                    <span class="xp-values-text" id="profileXpProgressText">0 / 100 XP</span>
+                  </div>
+                  <div class="xp-progress-bar-bg">
+                    <div class="xp-progress-bar-fill" id="profileXpProgressFill" style="width: 0%"></div>
+                  </div>
+                </div>
+
+                <h4 class="section-title-neon" id="titleAchievements">Logros Desbloqueados</h4>
+                <div class="achievements-grid" id="achievementsGrid">
+                  <!-- Injected dynamically -->
+                  <div class="badge-item locked" id="badge-prompt_master">
+                    <div class="badge-icon">👑</div>
+                    <span class="badge-name">Prompt Master</span>
+                    <span class="badge-desc" id="descPromptMaster">Resuelve 8 lecciones.</span>
+                  </div>
+                  <div class="badge-item locked" id="badge-studio_architect">
+                    <div class="badge-icon">🧪</div>
+                    <span class="badge-name">Studio Architect</span>
+                    <span class="badge-desc" id="descStudioArchitect">Sube a Nivel 5.</span>
+                  </div>
+                  <div class="badge-item locked" id="badge-source_finder">
+                    <div class="badge-icon">📂</div>
+                    <span class="badge-name">Source Finder</span>
+                    <span class="badge-desc" id="descSourceFinder">Resuelve 3 lecciones.</span>
+                  </div>
+                  <div class="badge-item locked" id="badge-deep_mind">
+                    <div class="badge-icon">🔥</div>
+                    <span class="badge-name">Deep Mind</span>
+                    <span class="badge-desc" id="descDeepMind">Mantén racha activa.</span>
+                  </div>
+                </div>
+
+                <div class="danger-zone">
+                  <button class="btn-secondary btn-full" onclick="resetAppProgress()">
+                    <i class="fa-solid fa-trash-can"></i> <span id="btnResetText">REINICIAR DATOS</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Bottom Navigation Bar -->
+          <footer class="app-nav-bar">
+            <button class="nav-tab-btn active" id="tab-btn-path" onclick="switchTab('path')">
+              <i class="fa-solid fa-route"></i>
+              <span id="navPath">Camino</span>
+            </button>
+            <button class="nav-tab-btn" id="tab-btn-playground" onclick="switchTab('playground')">
+              <i class="fa-solid fa-flask"></i>
+              <span id="navLab">Laboratorio</span>
+            </button>
+            <button class="nav-tab-btn" id="tab-btn-leagues" onclick="switchTab('leagues')">
+              <i class="fa-solid fa-ranking-star"></i>
+              <span id="navLeague">Liga</span>
+            </button>
+            <button class="nav-tab-btn" id="tab-btn-profile" onclick="switchTab('profile')">
+              <i class="fa-solid fa-user-gear"></i>
+              <span id="navProfile">Perfil</span>
+            </button>
+          </footer>
+        </section>
+
+        <!-- ==================== INTERACTIVE LESSON RUNNER ==================== -->
+        <section id="screen-lesson" class="app-screen">
+          <header class="lesson-header">
+            <button class="btn-icon" id="btn-close-lesson" onclick="exitActiveLesson()">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="lesson-progress-container">
+              <div class="lesson-progress-bar-bg">
+                <div class="lesson-progress-bar-fill" id="lessonProgressBarFill" style="width: 0%"></div>
+              </div>
+            </div>
+            
+            <div class="lesson-stats">
+              <div class="stat-badge hearts-badge" id="lessonHeartsBadge">
+                <i class="fa-solid fa-heart text-red"></i>
+                <span id="lesson-hearts">5</span>
+              </div>
+            </div>
+          </header>
+
+          <div class="lesson-card-viewport">
+            <div class="lesson-card" id="activeLessonCard">
+              <!-- Injected dynamically by active card renderer -->
+            </div>
+          </div>
+
+          <!-- Slide-up confirmation footer -->
+          <footer class="lesson-footer" id="lessonConfirmationFooter">
+            <div class="footer-evaluation-feedback" id="evaluationFeedbackPanel">
+              <div class="feedback-mascot-avatar">
+                <img src="assets/vitru.png" alt="Vitrü Mini" class="mini-mascot">
+              </div>
+              <div class="feedback-text-content">
+                <h4 id="evalFeedbackTitle">¡Excelente trabajo!</h4>
+                <p id="evalFeedbackText">Has completado la sintaxis correctamente.</p>
+              </div>
+            </div>
+            
+            <button id="btn-lesson-action" class="btn-primary btn-full glow-cyan" onclick="handleLessonAction()">
+              <span id="lessonActionText">COMPROBAR</span> <i class="fa-solid fa-chevron-right"></i>
+            </button>
+          </footer>
+        </section>
+
+        <!-- ==================== XP AWARD & OUTRO OVERLAY ==================== -->
+        <section id="screen-outro" class="app-screen">
+          <div class="outro-particles"></div>
+          <div class="outro-body">
+            <div class="outro-badge-ring">
+              <div class="glowing-aura animate-pulse"></div>
+              <img src="assets/vitru.png" alt="Vitrü Winner" class="outro-mascot">
+            </div>
+            
+            <h2 id="outroTitle" class="outro-title">¡LECCIÓN COMPLETADA!</h2>
+            <p id="outroSub" class="outro-subtitle">Vitrü está muy orgulloso de tu avance cognitivo.</p>
+            
+            <div class="outro-stats-cards">
+              <div class="outro-stat-card border-cyan">
+                <span class="stat-title" id="outroXpTitle">XP GANADA</span>
+                <span class="stat-value text-cyan" id="outroXpVal">+20 XP</span>
+              </div>
+              <div class="outro-stat-card border-magenta">
+                <span class="stat-title" id="outroStreakTitle">RACHA ACTIVA</span>
+                <span class="stat-value text-magenta" id="outroStreakVal">3 Días</span>
+              </div>
+            </div>
+
+            <div class="outro-level-up-drawer" id="outroLevelUpDrawer">
+              <span class="level-up-tag animate-bounce" id="lblLevelUp">¡SUBIDA DE NIVEL!</span>
+              <p id="outroLevelUpMsg">Has alcanzado el Nivel 3. Tus corazones se han recargado al 100%.</p>
+            </div>
+          </div>
+          
+          <div class="outro-footer">
+            <button id="btn-outro-finish" class="btn-primary glow-cyan btn-full" onclick="finishLessonFlow()">
+              <span id="btnOutroText">CONTINUAR AL CAMINO</span> <i class="fa-solid fa-door-open"></i>
+            </button>
+          </div>
+        </section>
+
+      </div>
+    </div>
+    
+  </div>
+
+  <!-- CORE SCRIPTS IMPORT -->
+  <script src="curriculum.js"></script>
+  <script src="state.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
