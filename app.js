@@ -620,7 +620,8 @@ function handleLessonAction() {
     
     // Happy Mascot Update
     feedbackMascotImg.src = "assets/vitru-happy.png";
-    utterance.text = "Good job!";
+    const successPhrases = ["Good job!", "You rock!", "Excellent!", "You are right!", "That's good!", "Ok!"];
+    utterance.text = successPhrases[Math.floor(Math.random() * successPhrases.length)];
   } else {
     playSynthesizerSound("error");
     feedbackPanel.className = "footer-evaluation-feedback incorrect";
