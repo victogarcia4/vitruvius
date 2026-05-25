@@ -453,6 +453,42 @@ function renderActiveLessonCard() {
 
   container.innerHTML = "";
 
+  // Render Theory Box
+  if (card.theory_en || card.theory_es) {
+    const theoryText = lang === "es" ? card.theory_es : card.theory_en;
+    
+    const theoryBox = document.createElement("div");
+    theoryBox.className = "theory-box";
+    
+    const theoryHeader = document.createElement("div");
+    theoryHeader.className = "theory-header";
+    
+    const theoryIcon = document.createElement("span");
+    theoryIcon.innerHTML = "💡";
+    theoryHeader.appendChild(theoryIcon);
+    
+    const listenBtn = document.createElement("button");
+    listenBtn.className = "btn-listen-theory";
+    listenBtn.innerHTML = '<i class="fa-solid fa-volume-high"></i> ' + (lang === "es" ? "Escuchar" : "Listen");
+    listenBtn.onclick = () => {
+      const synth = window.speechSynthesis;
+      synth.cancel(); // Stop any currently playing audio
+      const utterance = new SpeechSynthesisUtterance(theoryText);
+      utterance.lang = lang === "es" ? "es-ES" : "en-US";
+      synth.speak(utterance);
+    };
+    theoryHeader.appendChild(listenBtn);
+    
+    theoryBox.appendChild(theoryHeader);
+    
+    const theoryP = document.createElement("p");
+    theoryP.className = "theory-text";
+    theoryP.textContent = theoryText;
+    theoryBox.appendChild(theoryP);
+    
+    container.appendChild(theoryBox);
+  }
+
   const questionTitle = document.createElement("h3");
   questionTitle.className = "lesson-card-question";
   questionTitle.textContent = lang === "es" ? card.question_es : card.question_en;
