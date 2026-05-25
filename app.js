@@ -704,13 +704,31 @@ function handleLessonAction() {
 }
 
 function exitActiveLesson() {
-  playSynthesizerSound("error");
-  transitionScreen("screen-lesson", "screen-dashboard");
-  switchTab("path");
+  try {
+    playSynthesizerSound("error");
+  } catch (e) {
+    console.warn("Sound play failed inside exitActiveLesson:", e);
+  }
+  try {
+    transitionScreen("screen-lesson", "screen-dashboard");
+  } catch (e) {
+    console.error("exitActiveLesson transition failed:", e);
+    document.getElementById("screen-lesson").classList.remove("active");
+    document.getElementById("screen-dashboard").classList.add("active");
+  }
+  try {
+    switchTab("path");
+  } catch (e) {
+    console.error("exitActiveLesson switchTab failed:", e);
+  }
 }
 
 function finishLessonWithOutro() {
-  playSynthesizerSound("levelUp");
+  try {
+    playSynthesizerSound("levelUp");
+  } catch (e) {
+    console.warn("Sound play failed inside finishLessonWithOutro:", e);
+  }
   
   const lang = window.vitruviusState.state.preferredLanguage;
   const state = window.vitruviusState.state;
@@ -719,7 +737,13 @@ function finishLessonWithOutro() {
   const rewards = window.vitruviusState.completeLesson(activeLesson.id, activeLesson.xp);
   updateHUD();
 
-  transitionScreen("screen-lesson", "screen-outro");
+  try {
+    transitionScreen("screen-lesson", "screen-outro");
+  } catch (e) {
+    console.error("finishLessonWithOutro transition failed:", e);
+    document.getElementById("screen-lesson").classList.remove("active");
+    document.getElementById("screen-outro").classList.add("active");
+  }
 
   // Populating awards
   document.getElementById("outroXpVal").textContent = `+${rewards.gained} XP`;
@@ -737,9 +761,23 @@ function finishLessonWithOutro() {
 }
 
 function finishLessonFlow() {
-  playSynthesizerSound("click");
-  transitionScreen("screen-outro", "screen-dashboard");
-  switchTab("path");
+  try {
+    playSynthesizerSound("click");
+  } catch (e) {
+    console.warn("Sound play failed inside finishLessonFlow:", e);
+  }
+  try {
+    transitionScreen("screen-outro", "screen-dashboard");
+  } catch (e) {
+    console.error("finishLessonFlow transition failed:", e);
+    document.getElementById("screen-outro").classList.remove("active");
+    document.getElementById("screen-dashboard").classList.add("active");
+  }
+  try {
+    switchTab("path");
+  } catch (e) {
+    console.error("finishLessonFlow switchTab failed:", e);
+  }
 }
 
 // ==================== GOOGLE AI STUDIO SANDBOX WORKBENCH ====================
