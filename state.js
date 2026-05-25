@@ -104,7 +104,7 @@ class VitruviusState {
       lastHeartsSync: Date.now(),
       streak: 0,
       lastActiveDate: null, // "YYYY-MM-DD"
-      preferredLanguage: "es", // Bilingual defaults to Spanish as per user prompt, toggles to English.
+      preferredLanguage: "en", // Defaulting to English as requested.
       completedLessons: [],
       unlockedBadges: [],
       leagueTier: "Bronce", // Bronce, Plata, Oro, Obsidiana, Vitruviana

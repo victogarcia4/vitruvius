@@ -265,9 +265,10 @@ body.cyber-theme {
 #screen-splash {
   justify-content: space-between;
   align-items: center;
-  padding: 40px 24px;
+  padding: 30px 20px;
   background: linear-gradient(180deg, #0b1124 0%, #03050a 100%);
   text-align: center;
+  overflow-y: auto;
 }
 
 .lang-selector-floating {
@@ -331,6 +332,9 @@ body.cyber-theme {
 
 .splash-mascot {
   max-width: 130px;
+  max-height: 130px;
+  border-radius: 50%;
+  object-fit: cover;
   z-index: 5;
   animation: float-mascot 3.5s infinite ease-in-out;
 }

@@ -603,19 +603,33 @@ function handleLessonAction() {
   const feedbackPanel = document.getElementById("evaluationFeedbackPanel");
   const feedbackTitle = document.getElementById("evalFeedbackTitle");
   const feedbackText = document.getElementById("evalFeedbackText");
+  const feedbackMascotImg = document.getElementById("feedbackMascotImg");
 
   feedbackPanel.style.display = "flex";
+  
+  // Speech Synthesis Configuration
+  const synth = window.speechSynthesis;
+  let utterance = new SpeechSynthesisUtterance();
+  utterance.lang = "en-US";
   
   if (correct) {
     playSynthesizerSound("correct");
     feedbackPanel.className = "footer-evaluation-feedback correct";
     feedbackTitle.textContent = dict.excellentTxt;
     feedbackText.textContent = lang === "es" ? card.explanation_es : card.explanation_en;
+    
+    // Happy Mascot Update
+    feedbackMascotImg.src = "assets/vitru-happy.png";
+    utterance.text = "Good job!";
   } else {
     playSynthesizerSound("error");
     feedbackPanel.className = "footer-evaluation-feedback incorrect";
     feedbackTitle.textContent = dict.incorrectTxt;
     feedbackText.textContent = lang === "es" ? card.explanation_es : card.explanation_en;
+    
+    // Sad Mascot Update
+    feedbackMascotImg.src = "assets/vitru-sad.png";
+    utterance.text = "Try again!";
 
     // Deduct Hearts
     activeLessonHearts--;
@@ -635,6 +649,11 @@ function handleLessonAction() {
   const actionBtn = document.getElementById("btn-lesson-action");
   actionBtn.className = correct ? "btn-primary btn-full glow-emerald" : "btn-primary btn-full glow-magenta";
   document.getElementById("lessonActionText").textContent = dict.nextBtn;
+
+  // Play Speech
+  if (!soundMuted) {
+    synth.speak(utterance);
+  }
 }
 
 function exitActiveLesson() {
