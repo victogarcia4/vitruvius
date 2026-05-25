@@ -8,18 +8,62 @@ class VitruviusState {
     this.storageKey = "vitruvius_app_state";
     this.heartRegenTimeMs = 4 * 60 * 60 * 1000; // 4 hours
     this.maxHearts = 5;
-    this.state = this.loadState();
+    this.state = this.loadLocalState(); // Fallback
+    
+    // Firebase references
+    this.fb = null;
+    this.uid = null;
+    this.isOnline = false;
+
     this.syncHearts();
     this.checkStreakExpiration();
   }
 
-  // Initialize or load state from localStorage
-  loadState() {
+  // Asynchronous init for Firebase
+  async initFirebase(onAuthStateChangeCallback) {
+    try {
+      this.fb = await import('./firebase-config.js');
+      
+      this.fb.onAuthStateChanged(this.fb.auth, async (user) => {
+        if (user) {
+          this.uid = user.uid;
+          this.state.displayName = user.displayName || "AI Explorer";
+          this.isOnline = true;
+          
+          // Try to load from Firebase
+          await this.loadFromFirebase();
+        } else {
+          this.uid = null;
+          this.isOnline = false;
+        }
+        if (onAuthStateChangeCallback) onAuthStateChangeCallback(user);
+      });
+    } catch (e) {
+      console.error("Failed to load Firebase", e);
+    }
+  }
+
+  async loginWithGoogle() {
+    if (!this.fb) return;
+    try {
+      await this.fb.signInWithPopup(this.fb.auth, this.fb.googleProvider);
+    } catch (e) {
+      console.error("Login failed", e);
+    }
+  }
+
+  async logout() {
+    if (!this.fb) return;
+    await this.fb.signOut(this.fb.auth);
+    this.resetState();
+  }
+
+  // Load local state as fallback
+  loadLocalState() {
     const cached = localStorage.getItem(this.storageKey);
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        // Ensure default fields exist
         if (!parsed.botCompetitors || parsed.botCompetitors.length === 0) {
           parsed.botCompetitors = this.generateBotCompetitors();
         }
@@ -28,8 +72,27 @@ class VitruviusState {
         console.error("Error parsing cached state, resetting.", e);
       }
     }
-
     return this.getInitialState();
+  }
+
+  async loadFromFirebase() {
+    if (!this.isOnline || !this.uid) return;
+    const userRef = this.fb.ref(this.fb.database, `users/${this.uid}`);
+    try {
+      const snapshot = await this.fb.get(userRef);
+      if (snapshot.exists()) {
+        const cloudState = snapshot.val();
+        // Merge cloud state with local state (keep cloud as source of truth)
+        this.state = { ...this.getInitialState(), ...cloudState };
+      } else {
+        // First time in cloud, upload local state
+        await this.saveToFirebase();
+      }
+      this.syncHearts();
+      this.saveLocal(); // sync local cache
+    } catch (e) {
+      console.error("Error loading from Firebase", e);
+    }
   }
 
   getInitialState() {
@@ -51,8 +114,23 @@ class VitruviusState {
     };
   }
 
-  save() {
+  saveLocal() {
     localStorage.setItem(this.storageKey, JSON.stringify(this.state));
+  }
+
+  async saveToFirebase() {
+    if (!this.isOnline || !this.uid) return;
+    const userRef = this.fb.ref(this.fb.database, `users/${this.uid}`);
+    try {
+      await this.fb.set(userRef, this.state);
+    } catch (e) {
+      console.error("Error saving to Firebase", e);
+    }
+  }
+
+  save() {
+    this.saveLocal();
+    this.saveToFirebase(); // async call, we don't block
   }
 
   resetState() {
@@ -277,7 +355,48 @@ class VitruviusState {
     this.save();
   }
 
+  async fetchGlobalLeaderboard() {
+    if (!this.isOnline || !this.fb) return this.getLeaderboard(); // local bots fallback
+
+    try {
+      const usersRef = this.fb.query(this.fb.ref(this.fb.database, 'users'), this.fb.orderByChild('weeklyXP'), this.fb.limitToLast(50));
+      const snapshot = await this.fb.get(usersRef);
+      
+      if (snapshot.exists()) {
+        const board = [];
+        snapshot.forEach((childNode) => {
+          const val = childNode.val();
+          board.push({
+            name: childNode.key === this.uid ? `${val.displayName} (Tú)` : val.displayName,
+            weeklyXP: val.weeklyXP || 0,
+            avatarColor: childNode.key === this.uid ? "#00f0ff" : `hsl(${Math.floor(Math.random() * 360)}, 70%, 60%)`,
+            isUser: childNode.key === this.uid
+          });
+        });
+        
+        // Ensure user is in the list even if not in top 50 (for a real app we'd query specifically, but this is okay for now)
+        const userInBoard = board.find(p => p.isUser);
+        if (!userInBoard) {
+          board.push({
+            name: `${this.state.displayName} (Tú)`,
+            weeklyXP: this.state.weeklyXP,
+            avatarColor: "#00f0ff",
+            isUser: true
+          });
+        }
+        
+        board.sort((a, b) => b.weeklyXP - a.weeklyXP);
+        return board;
+      }
+    } catch (e) {
+      console.error("Failed to fetch global leaderboard", e);
+    }
+    
+    return this.getLeaderboard(); // fallback
+  }
+
   getLeaderboard() {
+    // Local bot leaderboard fallback
     const userRow = {
       name: `${this.state.displayName} (Tú)`,
       weeklyXP: this.state.weeklyXP,

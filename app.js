@@ -132,12 +132,34 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(() => {
     updateHeartsTimer();
   }, 1000);
+
+  // Initialize Firebase (Async)
+  window.vitruviusState.initFirebase((user) => {
+    if (user) {
+      document.getElementById("btn-google-login").style.display = "none";
+      // Update UI after Firebase syncs local state
+      updateHUD();
+      renderLeaderboard();
+      renderProfile();
+    } else {
+      document.getElementById("btn-google-login").style.display = "block";
+    }
+  });
 });
 
 function setupEventListeners() {
   // Splash Screen Trigger
   document.getElementById("btn-start").addEventListener("click", () => {
     playSynthesizerSound("start");
+    transitionScreen("screen-splash", "screen-dashboard");
+    switchTab("path");
+  });
+
+  // Google Login Trigger
+  document.getElementById("btn-google-login").addEventListener("click", async () => {
+    playSynthesizerSound("click");
+    document.getElementById("loginText").textContent = "CONECTANDO...";
+    await window.vitruviusState.loginWithGoogle();
     transitionScreen("screen-splash", "screen-dashboard");
     switchTab("path");
   });
@@ -753,9 +775,9 @@ async function runSandboxPrompt() {
 }
 
 // ==================== VIEW RENDERING: LEAGUES & PROFILE ====================
-function renderLeaderboard() {
+async function renderLeaderboard() {
   const lang = window.vitruviusState.state.preferredLanguage;
-  const board = window.vitruviusState.getLeaderboard();
+  const board = await window.vitruviusState.fetchGlobalLeaderboard();
   const list = document.getElementById("leaderboardList");
   
   if (!list) return;
